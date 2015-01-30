@@ -3,6 +3,7 @@ module Useful where
 
 import Data.List (elemIndex, maximum, sort, group, intercalate)
 import Data.List.Split (splitOn)
+import Data.Maybe (isJust, fromJust)
 
 fac :: Integral a => a -> a
 fac n | n < 0 = undefined
@@ -109,3 +110,13 @@ squareRoot n =
 
 isSquare :: Integral a => a -> Bool
 isSquare n = (squareRoot n)^2 == n
+
+leave :: Int -> [a] -> [a]
+leave n xs = drop (length xs - n) xs
+
+deleteIndex :: Int -> [a] -> [a]
+deleteIndex ind ls = take ind ls ++ drop (ind + 1) ls 
+
+demaybe :: [Maybe a] -> [a]
+demaybe ms = map fromJust $ filter isJust ms
+
