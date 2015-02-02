@@ -2,7 +2,7 @@
 import Data.List
 import Data.List.Split
 import Data.Maybe
-import Useful (deleteIndex, demaybe)
+import Useful (demaybe)
 import Control.Monad.State
 import qualified Data.Map as M 
 
