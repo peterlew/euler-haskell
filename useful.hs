@@ -120,3 +120,5 @@ deleteIndex ind ls = take ind ls ++ drop (ind + 1) ls
 demaybe :: [Maybe a] -> [a]
 demaybe ms = map fromJust $ filter isJust ms
 
+count :: (a -> Bool) -> [a] -> Int
+count f xs = length $ filter f xs
