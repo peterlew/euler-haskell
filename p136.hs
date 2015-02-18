@@ -3,8 +3,9 @@ import Useful (count)
 import qualified Data.Numbers.Primes as P
 
 --unique solution means n is a prime with p = 3 mod 4
---or n is a number 2^k*p where k is 2 or 4, p prime
---the first is easy to prove, the second I'm not sure why
+--or n is a number k*p where k is 4 or 16, p prime
+--it is easy to prove why these cases provide a unique solution, 
+--but I haven't proved why they are the ONLY cases
 
 cap :: Integer
 cap = 50000000
