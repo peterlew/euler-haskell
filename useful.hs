@@ -122,3 +122,8 @@ demaybe ms = map fromJust $ filter isJust ms
 
 count :: (a -> Bool) -> [a] -> Int
 count f xs = length $ filter f xs
+
+fmod :: Double -> Double -> Double
+fmod x n | x >= 0 && x < n = x
+fmod x n | x < 0 = fmod (x + n) n
+fmod x n = fmod (x - n) n
