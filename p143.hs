@@ -4,16 +4,34 @@ import Data.List
 import qualified Data.Map as M 
 
 maxPQR :: Integer
-maxPQR = 5000
+maxPQR = 120000
 
 maxPQ :: Integer
 maxPQ = maxPQR 
 
+--every triangle has a p, q, r that intersect at a 3x 120 degree angle
+--this forms three interior integral-sided triangles pqa, prb, qrc
+--they obey the cosine law, so p^2 + q^2 + p * q = a^2, etc.
+
+--that means we need three intersecting pairs of p and q that satisfy
+--p^2 + q^2 + p * q = a^2
+
+--substituting x = q - p, y = p + q, z = 2 * a, we have 
+--x^2 + 3 * y^2 = z^2
+
 maxX :: Integer
-maxX = maxPQR
+maxX = maxPQ
 
 maxY :: Integer
-maxY = maxPQR
+maxY = maxPQ
+
+--this formula has two parametrizations, 
+--1: x = +- s^2 - 3t^2, y = 2 * s * t
+--2: x = +- s^2 + t^2 + 4 * s * t, y = s^2 - t^2
+
+--the bounds are a bit tricky, and I fudged them a little...
+--the pairMapBrute uses a simple brute force algorithm and was used
+--to make sure the pairMapFancy was correct, up to about maxPQR = 5000
 
 candXYZ1Prim :: [(Integer, Integer, Integer)]
 candXYZ1Prim = 
@@ -37,6 +55,7 @@ candXYZ2Prim =
     let tsPairs = [  
          (s^2 + t^2 + 4 * s * t, s^2 - t^2) |
          s <- [-maxS..maxS]\\[0],
+         --pretty sure on the bound below
          let cap = min (abs s) (squareRoot (3 * s^2 + maxX) - 2 * s ),
          t <- if s < 0 then [1..cap] else [-cap..(-1)],
          gcd s t == 1,
@@ -78,6 +97,11 @@ allABs = nub $ sort (validAB candXYZ1Prim ++ validAB candXYZ2Prim)
 validPQ :: (Integer, Integer) -> Bool
 validPQ (p, q) = isSquare (p^2 + q^2 + p * q)
 
+validPQR :: (Integer, Integer, Integer) -> Bool
+validPQR (p, q, r) = validPQ (p, q) &&
+                     validPQ (p, r) &&
+                     validPQ (q, r)
+
 pairList :: [(Integer, [Integer])]
 pairList = map f [1..maxPQR]
  where f p = (p, filter (g p) [1..maxPQR])
@@ -98,4 +122,29 @@ pairMapFromList ps =
 
 pairMapFancy :: M.Map Integer [Integer]
 pairMapFancy = M.map sort $ pairMapFromList allABs
-                             
+    
+--once we have our pairs, we need to find the 3-cliques, or triangles
+
+trianglesAt :: Integer -> M.Map Integer [Integer] -> [(Integer, Integer, Integer)]
+trianglesAt p m =
+    let adjs = m M.! p
+        f k = map (\a -> (p, k, a)) $ intersect (m M.! k) adjs 
+    in concat $ map f adjs
+
+hitMap :: M.Map Integer [(Integer, Integer, Integer)]
+hitMap = M.filter (/= []) $
+         M.mapWithKey f pairMapFancy
+ where f k a = trianglesAt k pairMapFancy
+
+hits :: [(Integer, Integer, Integer)]
+hits = nub $ map sortTup $ M.foldr (++) [] hitMap
+ where sortTup (a, b, c) = 
+        let [d, e, f] = sort [a, b, c]
+        in (d, e, f)
+
+p143 :: Integer
+p143 = sum $ nub $ filter (<= maxPQR) $ map addTup hits
+ where addTup (a, b, c) = a + b + c
+
+main = do
+    print p143
