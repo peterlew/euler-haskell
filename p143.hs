@@ -4,7 +4,7 @@ import Data.List
 import qualified Data.Map as M 
 
 maxPQR :: Integer
-maxPQR = 4000
+maxPQR = 5000
 
 maxPQ :: Integer
 maxPQ = maxPQR 
@@ -38,7 +38,7 @@ candXYZ2Prim =
          (s^2 + t^2 + 4 * s * t, s^2 - t^2) |
          s <- [-maxS..maxS]\\[0],
          let cap = min (abs s) (squareRoot (3 * s^2 + maxX) - 2 * s ),
-         t <- [-cap..cap]\\[0],
+         t <- if s < 0 then [1..cap] else [-cap..(-1)],
          gcd s t == 1,
          mod (s - t) 2 == 1,
          mod s 3 /= mod t 3
