@@ -5,6 +5,14 @@ import Data.List (elemIndex, maximum, sort, group, intercalate)
 import Data.List.Split (splitOn)
 import Data.Maybe (isJust, fromJust)
 
+type Frac = (Integer, Integer)
+
+fReduce :: Frac -> Frac
+fReduce (n, d) = let g = gcd n d in (div n g, div d g)
+
+fMult :: Frac -> Frac -> Frac
+fMult (n1, d1) (n2, d2) = fReduce (n1 * n2, d1 * d2)
+
 fac :: Integral a => a -> a
 fac n | n < 0 = undefined
 fac 0 = 1
