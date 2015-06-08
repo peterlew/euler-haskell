@@ -230,3 +230,27 @@ caps = array (1,n) ((1,[1]) : [(i,cs) | i  <- [2..n],
 
 main4 :: IO ()
 main4 = putStrLn $ show . length . toList . fromList . concat $ elems caps
+
+--to get used to it, I wrote my own version of this code. It's practically identical,
+--but hey, I wrote it
+
+import Data.Array
+import Data.Ratio
+import qualified Data.Set as S 
+
+data Circuit = Cap (Ratio Int) | Parallel Circuit Circuit | Series Circuit Circuit
+ deriving (Show, Eq)
+
+capacitance :: Circuit -> Ratio Int
+capacitance (Cap c) = c
+capacitance (Parallel c1 c2) = capacitance c1 + capacitance c2
+capacitance (Series c1 c2) = 1 / (1 / capacitance c1 + 1 / capacitance c2)
+
+n = 18
+cs :: Array Int [Ratio Int]
+cs = array (1, n) ((1, [60]) : [ (i, caps) | i <- [2..n], 
+      let caps = S.toList $ S.fromList $ map capacitance $ 
+                  concat [[Parallel (Cap c1) (Cap c2), Series (Cap c1) (Cap c2)] | 
+                          i' <- [1..div i 2],
+                          c1 <- cs!i',
+                          c2 <- cs!(i - i')]])
